@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# TODO: create source package
+
+set -e
+echo "=== Installing CF CLI ==="
+aptitude -y install golang-go help2man
+
+export PRJ=$CF_CLI_PKG_NAME
+export UBUNTU_VERSION=$CF_CLI_PKG_VERSION
+export SRC=$CF_CLI_REPO
+export WORKDIR="cli"
+source $LIB_FOLDER/begin
+
+git clone $SRC $WORKDIR
+VERSION_LINE=`cat $WORKDIR/src/cf/app_constants.go | egrep -i -o 'Version\s*=\s*"([^"]+)"'`
+VERSION=`echo $(expr "$VERSION_LINE" : '.*"\([^"]*\)".*') | cut -d'-' -f 1`
+if [ ! $VERSION ]; then
+  echo "Cannot extract Version"
+  exit 1
+fi
+PKG=$PRJ-$VERSION
+mv $WORKDIR $PKG
+
+echo "Building package structure..."
+deb_dir_structure . $PKG $PRJ
+
+cd $PKG
+git submodule update --init --recursive
+
+echo "Building..."
+./bin/build
+echo "Now you should see help output"
+./out/gcf
+
+echo "Stripping binary file..."
+strip --strip-debug --strip-unneeded -o ./usr/bin/gcf ./out/gcf
+chmod 0755 ./usr/bin/gcf
+
+echo "Creating man file..."
+cd ./usr/bin/
+help2man ./gcf > ../share/man/man1/gcf.1
+cd -
+sed -i "s/gcf \\\- .*/gcf \\\- A command line tool to interact with Cloud Foundry/" ./usr/share/man/man1/gcf.1
+gzip -9 ./usr/share/man/man1/gcf.1
+chmod 0644 ./usr/share/man/man1/gcf.1.gz
+
+echo "Getting dependencies..."
+DEPENDS=`$LIB_FOLDER/dependencies ./usr/bin/gcf`
+
+echo "Making source packages..."
+dh_make --createorig --packagename $PRJ"_"$VERSION --packageclass "s" --copyright "apache" --yes
+rm -rf debian
+mkdir debian
+
+echo "Copy rules and compat..."
+cp $FILES_FOLDER/$PRJ/compat ./debian/
+cp $FILES_FOLDER/$PRJ/rules ./debian/
+
+echo "Creating control file..."
+cp $FILES_FOLDER/$PRJ/control ./debian
+sed -i "s|package_name|$PRJ|g" ./debian/control
+sed -i "s|app_version-ubuntu_version|$VERSION-$UBUNTU_VERSION|g" ./debian/control
+sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/control
+sed -i "s/DEPENDENCIES/$DEPENDS/g" ./debian/control
+chmod 0644 ./debian/control
+
+echo "Creating changelog file..."
+cp $FILES_FOLDER/$PRJ/changelog ./debian
+sed -i "s|package_name|$PRJ|g" ./debian/changelog
+sed -i "s|distro|$DISTRO|g" ./debian/changelog
+sed -i "s|app_version-ubuntu_version|$VERSION-$UBUNTU_VERSION|g" ./debian/changelog
+sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/changelog
+sed -i "s|date|$(date -R)|g" ./debian/changelog
+chmod 0644 ./debian/changelog
+
+echo "Creating copyright file..."
+cp $FILES_FOLDER/$PRJ/copyright ./debian/
+sed -i "s|src|$SRC|g" ./debian/copyright
+sed -i "s/package_name/$PRJ/g" ./debian/copyright
+sed -i "s/year/$(date +%Y)/g" ./debian/copyright
+$LIB_FOLDER/cf_cli_copyright ./LICENSE ./debian/copyright
+chmod 0644 ./debian/copyright
+
+echo "Create Install script..."
+cp $FILES_FOLDER/$PRJ/install ./debian/$PRJ.install
+chmod 0644 ./debian/$PRJ.install
+
+echo "Building packages..."
+dpkg-buildpackage $DASH_S -rfakeroot
+if [[ $DASH_S == "" ]]
+then
+  lintian ../$PRJ"_"$VERSION-$UBUNTU_VERSION"_"amd64.deb
+fi
+
+echo "Moving packages to $PKGS_FOLDER..."
+cd ..
+rm -rf $PKG
+mv ./* $PKGS_FOLDER/
+echo "Done"
+
+source $LIB_FOLDER/end
+

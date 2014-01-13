@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+original_folder=`pwd`
+cd $(dirname $0)
+current_folder=`pwd`
+source ./conf
+
+if [[ -d /$INSTALL_FOLDER ]]; then
+  echo "Building process needs /$INSTALL_FOLDER. Please rename ( or move to bak folder ) your original /$INSTALL_FOLDER and run this script again."
+  exit 1
+fi
+mkdir /$INSTALL_FOLDER
+
+# Build dependencies
+aptitude -y install git binutils lintian dh-make gnupg
+
+if [[ -d $FILES_FOLDER/keys/ ]]
+then
+  set +e
+  gpg --import $FILES_FOLDER/keys/pub.gpg
+  gpg --allow-secret-key-import --import $FILES_FOLDER/keys/prv.gpg
+  set -e
+fi
+
+# CF CLI
+./scripts/cli
+
+# CF Cloud Controller
+./scripts/cloud_controller
+
+rm -rf /$INSTALL_FOLDER
+cd $original_folder
+

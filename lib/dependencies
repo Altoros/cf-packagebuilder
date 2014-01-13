@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use strict;
+my %pkgs=();
+my $ldd = qx/ldd $ARGV[0]/;
+while($ldd =~ /=>\s*([^\s]+)\s*\(/g )
+{
+  if (-f $1)
+  {
+    my $dpkg = qx/dpkg -S $1/;
+    my ($pkg)= split(':', $dpkg);
+    if(length($pkg) > 0)
+    {
+      $pkgs{$pkg}=1;
+    }
+  }
+}
+print join( ", ", keys(%pkgs))
+

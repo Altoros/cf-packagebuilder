@@ -1,0 +1,11 @@
+#!/bin/bash
+
+source $LIB_FOLDER/deb_dir_structure
+source $LIB_FOLDER/deb_permissions
+original_folder=`pwd`
+if [ ! -d "$TMP_FOLDER/$PRJ" ]; then
+  mkdir $TMP_FOLDER/$PRJ
+fi
+cd $TMP_FOLDER/$PRJ
+current_folder=`pwd`
+

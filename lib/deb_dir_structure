@@ -1,0 +1,8 @@
+#!/bin/bash
+
+function deb_dir_structure {
+  mkdir -p $1/$2/usr/bin
+  mkdir -p $1/$2/usr/share/doc/$3
+  mkdir -p $1/$2/usr/share/man/man1
+  chmod -R 0755 $1/$2
+}
