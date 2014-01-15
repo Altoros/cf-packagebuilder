@@ -1,0 +1,138 @@
+#!/bin/bash
+
+set -e
+echo "=== Packing jobs ==="
+aptitude -y install ruby1.9.3 ruby-bundler
+
+export PRJ=cfjobs
+export FILES=$PRJ
+export UBUNTU_VERSION=$CF_CCONTROLLER_PKG_VERSION
+export SRC=$CF_JOBS_RELEASE_REPO
+source $LIB_FOLDER/begin
+
+export RELEASE_FOLDER="release"
+export BUILDER_FOLDER="builder"
+export BUILDER=$current_folder/$BUILDER_FOLDER/build.rb
+echo "Cloning releases..."
+git clone $CF_JOBS_RELEASE_REPO ./$RELEASE_FOLDER
+echo "Cloning builder..."
+git clone $CF_JOBS_BUILDER_REPO ./$BUILDER_FOLDER
+
+echo "Getting release version..."
+VERSION_LINE=`tail -n 1 $RELEASE_FOLDER/releases/index.yml`
+VERSION=${VERSION_LINE//[!0-9]}
+if [ ! $VERSION ]; then
+  echo "Cannot extract Version"
+  exit 1
+fi
+echo "Getting jobs versions..."
+VERSION_FILE=$RELEASE_FOLDER/releases/cf-$VERSION.yml
+VERSIONS_STTRING=`$LIB_FOLDER/job_versions $VERSION_FILE`
+declare -A VERSIONS
+versions=(${VERSIONS_STTRING//;/ })
+for i in "${!versions[@]}"
+do
+  version=(${versions[i]//:/ })
+  version_name="${version[0]}"
+  version_value="${version[1]}"
+  VERSIONS+=( [$version_name]=$version_value )
+done
+
+cf_jobs=(${CF_JOBS//;/ })
+for i in "${!cf_jobs[@]}"
+do
+  cf_job=(${cf_jobs[i]//:/ })
+  CF_JOB_FOLDER="${cf_job[0]}"
+  PRJ="${cf_job[1]}"
+  DEPENDS="${cf_job[2]}"
+  echo "*** Packing $CF_JOB_FOLDER ***"
+  VERSION=${VERSIONS[$CF_JOB_FOLDER]}
+  if [[ ! $VERSION ]]
+  then
+    echo "Cannot find version for job $CF_JOB_FOLDER"
+    exit 1
+  fi
+  SOURCE=$current_folder/$RELEASE_FOLDER/jobs/$CF_JOB_FOLDER
+  PKG=$PRJ-$VERSION
+
+  echo "Building package structure..."
+  deb_dir_structure . $PKG $PRJ
+  DESTINATION=./$PKG/$INSTALL_FOLDER/$DEPENDS/jobs
+  mkdir -p $DESTINATION
+
+  echo "Building job ..."
+  ruby $BUILDER $SOURCE $DESTINATION
+
+  echo "Set file permissions..."
+  deb_permissions ./$PKG/
+  chmod 0755 $DESTINATION/bin/*
+
+  echo "Creating man file for $f..."
+  cp $FILES_FOLDER/$FILES/man ./$PKG/usr/share/man/man1/$f.1
+  sed -i "s|u_bin_name|${PRJ^^}|" ./$PKG/usr/share/man/man1/$f.1
+  sed -i "s|day|$(date +%d)|" ./$PKG/usr/share/man/man1/$f.1
+  sed -i "s|month|$(date +%B)|" ./$PKG/usr/share/man/man1/$f.1
+  sed -i "s|year|$(date +%Y)|" ./$PKG/usr/share/man/man1/$f.1
+  sed -i "s|bin_name|$PRJ|" ./$PKG/usr/share/man/man1/$f.1
+  sed -i "s|prj_name|$DEPENDS|" ./$PKG/usr/share/man/man1/$f.1
+  gzip -9 ./$PKG/usr/share/man/man1/$f.1
+  chmod 0644 ./$PKG/usr/share/man/man1/$f.1.gz
+
+  echo "Making source packages..."
+  cd ./$PKG/
+  dh_make --createorig --packagename $PRJ"_"$VERSION --packageclass "s" --copyright "apache" --yes
+  rm -rf debian
+  mkdir debian
+
+  echo "Copy rules and compat..."
+  cp $FILES_FOLDER/$FILES/compat ./debian/
+  cp $FILES_FOLDER/$FILES/rules ./debian/
+
+  echo "Creating control file..."
+  cp $FILES_FOLDER/$FILES/control ./debian
+  sed -i "s|package_name|$PRJ|g" ./debian/control
+  sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/control
+  sed -i "s/DEPENDENCIES/$DEPENDS/g" ./debian/control
+  chmod 0644 ./debian/control
+
+  echo "Creating changelog file..."
+  cp $FILES_FOLDER/$FILES/changelog ./debian
+  sed -i "s|package_name|$PRJ|g" ./debian/changelog
+  sed -i "s|distro|$DISTRO|g" ./debian/changelog
+  sed -i "s|app_version-ubuntu_version|$VERSION-$UBUNTU_VERSION|g" ./debian/changelog
+  sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/changelog
+  sed -i "s|date|$(date -R)|g" ./debian/changelog
+  chmod 0644 ./debian/changelog
+
+  echo "Creating copyright file..."
+  cp $FILES_FOLDER/$FILES/copyright ./debian/
+  sed -i "s|src|$SRC|g" ./debian/copyright
+  sed -i "s|package_name|$PRJ|g" ./debian/copyright
+  sed -i "s|year|$(date +%Y)|g" ./debian/copyright
+  chmod 0644 ./debian/copyright
+
+  echo "Create Install script..."
+  cp $FILES_FOLDER/$FILES/install ./debian/$PRJ.install
+  chmod 0644 ./debian/$PRJ.install
+
+  echo "Building packages..."
+  dpkg-buildpackage $DASH_S -rfakeroot
+  if [[ $DASH_S == "" ]]
+  then
+    lintian ../$PRJ"_"$VERSION-$UBUNTU_VERSION"_"amd64.deb
+  fi
+
+  cd ..
+  rm -rf $PKG
+done
+
+echo "Moving packages to $PKGS_FOLDER..."
+rm -rf $current_folder/$RELEASE_FOLDER
+rm -rf $current_folder/$BUILDER_FOLDER
+mv ./* $PKGS_FOLDER/
+cd ..
+rm -rf $FILES
+echo "Done"
+
+source $LIB_FOLDER/end
+

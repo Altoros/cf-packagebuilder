@@ -23,11 +23,14 @@ then
   set -e
 fi
 
-# CF CLI
-./scripts/cli
+## CF CLI
+#./scripts/cli
+
+## CF Cloud Controller
+#./scripts/cloud_controller
 
 # CF Cloud Controller
-./scripts/cloud_controller
+./scripts/jobs
 
 rm -rf /$INSTALL_FOLDER
 cd $original_folder

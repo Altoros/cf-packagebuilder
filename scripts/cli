@@ -60,7 +60,6 @@ cp $FILES_FOLDER/$PRJ/rules ./debian/
 echo "Creating control file..."
 cp $FILES_FOLDER/$PRJ/control ./debian
 sed -i "s|package_name|$PRJ|g" ./debian/control
-sed -i "s|app_version-ubuntu_version|$VERSION-$UBUNTU_VERSION|g" ./debian/control
 sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/control
 sed -i "s/DEPENDENCIES/$DEPENDS/g" ./debian/control
 chmod 0644 ./debian/control

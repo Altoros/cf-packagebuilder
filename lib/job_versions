@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+
+data = YAML.load(File.read(ARGV[0]))
+raise "Cant read jobs versions: unknown file format" unless data.has_key?('packages')
+i = 0
+data['packages'].each do |job|
+  print ';' if i > 0
+  i += 1
+  print "#{job['name']}:#{job['version']}"
+end
+
