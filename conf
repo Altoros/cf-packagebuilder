@@ -8,6 +8,7 @@ fi
 # Global vars
 
 export BUILD=1
+export GBL_VER=1
 
 export CONF_FOLDER=$current_folder
 export LIB_FOLDER=$current_folder/lib
@@ -42,4 +43,8 @@ export CF_CCONTROLLER_REPO=https://github.com/cloudfoundry/cloud_controller_ng.g
 export CF_CCONTROLLER_PKG_NAME="cfcloudcontroller"
 export CF_CCONTROLLER_PKG_VERSION="1ppa"$BUILD
 
+# CF DEA
+export CF_DEA_REPO=https://github.com/cloudfoundry/dea_ng.git
+export CF_DEA_PKG_NAME="cfdea"
+export CF_DEA_PKG_VERSION="1ppa"$BUILD
 
