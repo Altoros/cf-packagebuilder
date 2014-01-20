@@ -32,6 +32,9 @@ fi
 # CF Cloud Controller
 ./scripts/jobs
 
+## CF Cloud Controller
+./scripts/uaa
+
 rm -rf /$INSTALL_FOLDER
 cd $original_folder
 

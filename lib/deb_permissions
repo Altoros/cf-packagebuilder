@@ -8,6 +8,8 @@ function detect_and_chmod {
      chmod 0755 "$data"
     elif [[ $file_type == application/x-*lib ]];then
      chmod 0644 "$data"
+    elif [[ $file_type == text/plain ]];then
+     chmod 0644 "$data"
     else 
      chmod g-w "$data"
      chmod o-w "$data"
