@@ -44,7 +44,7 @@ export CF_CCONTROLLER_REPO=https://github.com/cloudfoundry/cloud_controller_ng.g
 export CF_CCONTROLLER_PKG_NAME="cfcloudcontroller"
 export CF_CCONTROLLER_PKG_VERSION="1ppa"$BUILD
 
-# CF Cloud Controller
+# CF UAA
 export CF_UAA_REPO=https://github.com/cloudfoundry/uaa.git
 export CF_UAA_PKG_NAME="cfuaa"
 export CF_UAA_PKG_VERSION="1ppa"$BUILD
