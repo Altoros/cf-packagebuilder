@@ -7,6 +7,6 @@ Build-Depends: debhelper (>= 8.0.0)
 Package: package_name
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
-Description: Cloud Foundry CLI
- Cloud Foundry Command Line Interface. Package provides gcf tool for 
- cloudfoundry management. Run gcf for help.
+Description: Cloud Foundry Job for DEPENDENCIES package
+ Cloud Foundry Job for DEPENDENCIES package (dependency package).
+

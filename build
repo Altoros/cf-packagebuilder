@@ -29,6 +29,12 @@ fi
 # CF Cloud Controller
 ./scripts/cloud_controller
 
+# CF JOBS
+./scripts/jobs
+
+# CF UAA
+./scripts/uaa
+
 # CF DEA
 ./scripts/dea
 

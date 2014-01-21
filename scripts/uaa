@@ -1,54 +1,44 @@
 #!/bin/bash
 
-# TODO: create source package
-
 set -e
-echo "=== Installing CF CLI ==="
-aptitude -y install golang-go help2man
+echo "=== Installing UAA ==="
+aptitude -y install maven libjavacc-maven-plugin-java openjdk-7-jdk openjdk-7-jre
+JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 
-export PRJ=$CF_CLI_PKG_NAME
-export UBUNTU_VERSION=$CF_CLI_PKG_VERSION
-export SRC=$CF_CLI_REPO
-export WORKDIR="cli"
+export PRJ=$CF_UAA_PKG_NAME
+export UBUNTU_VERSION=$CF_UAA_PKG_VERSION
+export SRC=$CF_UAA_REPO
 source $LIB_FOLDER/begin
+git clone $SRC /$INSTALL_FOLDER/$PRJ
+cd /$INSTALL_FOLDER/$PRJ
+git submodule update --init --recursive
+mvn install
+find ./ -name .git* | xargs rm -rf
 
-git clone $SRC $WORKDIR
-VERSION_LINE=`cat $WORKDIR/src/cf/app_constants.go | egrep -i -o 'Version\s*=\s*"([^"]+)"'`
-VERSION=`echo $(expr "$VERSION_LINE" : '.*"\([^"]*\)".*') | cut -d'-' -f 1`
+echo "Getting version..."
+VERSION=`cat ./uaa/pom.xml | grep -m 1 -Po '(?<=<version>)(.*)(?=</version>)'`
 if [ ! $VERSION ]; then
   echo "Cannot extract Version"
   exit 1
 fi
 PKG=$PRJ-$VERSION
-mv $WORKDIR $PKG
 
+cd -
 echo "Building package structure..."
 deb_dir_structure . $PKG $PRJ
-
-cd $PKG
-git submodule update --init --recursive
-
-echo "Building..."
-./bin/build
-echo "Now you should see help output"
-./out/gcf
-
-echo "Stripping binary file..."
-strip --strip-debug --strip-unneeded -o ./usr/bin/gcf ./out/gcf
-chmod 0755 ./usr/bin/gcf
-
-echo "Creating man file..."
-cd ./usr/bin/
-help2man ./gcf > ../share/man/man1/gcf.1
-cd -
-sed -i "s/gcf \\\- .*/gcf \\\- A command line tool to interact with Cloud Foundry/" ./usr/share/man/man1/gcf.1
-gzip -9 ./usr/share/man/man1/gcf.1
-chmod 0644 ./usr/share/man/man1/gcf.1.gz
-
+mkdir -p ./$PKG/$INSTALL_FOLDER/
 echo "Getting dependencies..."
-DEPENDS=`$LIB_FOLDER/dependencies ./usr/bin/gcf`
+DEPENDS="ruby | ruby-interpreter, ruby1.9.3, maven, libjavacc-maven-plugin-java, openjdk-7-jdk, openjdk-7-jre"
+
+echo "Set file permissions..."
+deb_permissions ./$PKG/
+deb_permissions /$INSTALL_FOLDER/$PRJ
+
+echo "Moving project into the package dir..."
+mv /$INSTALL_FOLDER/$PRJ ./$PKG/$INSTALL_FOLDER/
 
 echo "Making source packages..."
+cd ./$PKG/
 dh_make --createorig --packagename $PRJ"_"$VERSION --packageclass "s" --copyright "apache" --yes
 rm -rf debian
 mkdir debian
@@ -76,9 +66,17 @@ chmod 0644 ./debian/changelog
 echo "Creating copyright file..."
 cp $FILES_FOLDER/$PRJ/copyright ./debian/
 sed -i "s|src|$SRC|g" ./debian/copyright
-sed -i "s/package_name/$PRJ/g" ./debian/copyright
-sed -i "s/year/$(date +%Y)/g" ./debian/copyright
-$LIB_FOLDER/cf_cli_copyright ./LICENSE ./debian/copyright
+sed -i "s|package_name|$PRJ|g" ./debian/copyright
+sed -i "s|year|$(date +%Y)|g" ./debian/copyright
+cp ./$INSTALL_FOLDER/$PRJ/LICENSE ./debian/copyright.tmp
+$LIB_FOLDER/replace_std_licenses ./debian/copyright.tmp
+sed -i 's|, 59 Temple Place - Suite 330,||g' ./debian/copyright.tmp
+sed -i 's|Boston, MA 02111-1307, USA.||g' ./debian/copyright.tmp
+sed -i 's|, 51 Franklin Street, Fifth Floor, Boston, MA||g' ./debian/copyright.tmp
+sed -i 's|02110-1301 USA.||g' ./debian/copyright.tmp
+$LIB_FOLDER/cf_cli_copyright ./debian/copyright.tmp ./debian/copyright
+rm ./debian/copyright.tmp
+rm ./$INSTALL_FOLDER/$PRJ/LICENSE
 chmod 0644 ./debian/copyright
 
 echo "Create Install script..."
@@ -89,7 +87,7 @@ echo "Building packages..."
 dpkg-buildpackage $DASH_S -rfakeroot
 if [[ $DASH_S == "" ]]
 then
-  lintian ../$PRJ"_"$VERSION-$UBUNTU_VERSION"_"amd64.deb
+ lintian ../$PRJ"_"$VERSION-$UBUNTU_VERSION"_"amd64.deb
 fi
 
 echo "Moving packages to $PKGS_FOLDER..."

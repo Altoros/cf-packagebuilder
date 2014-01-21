@@ -31,7 +31,8 @@ else
 fi
 
 export MAINTAINER_EMAIL="Cloud Foundry <cf-charm@altoros.com>"
-export DISTRO=saucy
+#export DISTRO=saucy # 13.10
+export DISTRO=trusty # 14.04
 
 # Cloudfoundry CLI
 export CF_CLI_REPO=https://github.com/cloudfoundry/cli.git
@@ -43,6 +44,11 @@ export CF_CCONTROLLER_REPO=https://github.com/cloudfoundry/cloud_controller_ng.g
 export CF_CCONTROLLER_PKG_NAME="cfcloudcontroller"
 export CF_CCONTROLLER_PKG_VERSION="1ppa"$BUILD
 
+# CF Cloud Controller
+export CF_UAA_REPO=https://github.com/cloudfoundry/uaa.git
+export CF_UAA_PKG_NAME="cfuaa"
+export CF_UAA_PKG_VERSION="1ppa"$BUILD
+  
 # CF DEA
 export CF_DEA_REPO=https://github.com/cloudfoundry/dea_ng.git
 export CF_DEA_PKG_NAME="cfdea"
@@ -52,4 +58,43 @@ export CF_DEA_PKG_VERSION="1ppa"$BUILD
 export CF_WARDEN_REPO=https://github.com/cloudfoundry/warden.git
 export CF_WARDEN_PKG_NAME="cfwarden"
 export CF_WARDEN_PKG_VERSION="1ppa"$BUILD
+
+# Jobs
+export CF_JOBS_RELEASE_REPO=https://github.com/cloudfoundry/cf-release.git
+export CF_JOBS_BUILDER_REPO=https://github.com/Altoros/cf-job2package-tool.git
+export CF_JOBS_PKG_VERSION="1ppa"$BUILD
+# Example:
+#   CF_JOBS=cloud_controller_ng:cfcloudcontrollerjob:cfcloudcontroller;uaa:cfuaajob:cfuaa
+# Format:
+#   Each job must be described as: 
+#     job folder name, job package name, dependency package name
+#     job folder name         - folder in https://github.com/cloudfoundry/cf-release/tree/master/jobs
+#     job package name        - package name which will be used during packing the job
+#     dependency package name - package which will be set as dependency for the job, 
+#                               and it will be used as install folder
+# Synrax: 
+#   ; job delimiter
+#   : values delimiter
+CF_JOBS="cloud_controller_ng:cfcloudcontrollerjob:cfcloudcontroller"
+#CF_JOBS=$CF_JOBS";collector::"
+#CF_JOBS=$CF_JOBS";dea_logging_agent::"
+#CF_JOBS=$CF_JOBS";dea_next::"
+#CF_JOBS=$CF_JOBS";debian_nfs_server::"
+#CF_JOBS=$CF_JOBS";etcd::"
+#CF_JOBS=$CF_JOBS";gorouter::"
+#CF_JOBS=$CF_JOBS";haproxy::"
+#CF_JOBS=$CF_JOBS";health_manager_next::"
+#CF_JOBS=$CF_JOBS";hm9000::"
+#CF_JOBS=$CF_JOBS";loggregator::"
+#CF_JOBS=$CF_JOBS";loggregator_trafficcontroller::"
+#CF_JOBS=$CF_JOBS";login::"
+#CF_JOBS=$CF_JOBS";nats::"
+#CF_JOBS=$CF_JOBS";nats_stream_forwarder::"
+#CF_JOBS=$CF_JOBS";pivotal_login::"
+#CF_JOBS=$CF_JOBS";postgres::"
+#CF_JOBS=$CF_JOBS";saml_login::"
+#CF_JOBS=$CF_JOBS";syslog_aggregator::"
+#CF_JOBS=$CF_JOBS";uaa:cfuaajob:cfuaa"
+export CF_JOBS
+
 
