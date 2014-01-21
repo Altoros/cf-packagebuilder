@@ -48,3 +48,8 @@ export CF_DEA_REPO=https://github.com/cloudfoundry/dea_ng.git
 export CF_DEA_PKG_NAME="cfdea"
 export CF_DEA_PKG_VERSION="1ppa"$BUILD
 
+# CF Warden
+export CF_WARDEN_REPO=https://github.com/cloudfoundry/warden.git
+export CF_WARDEN_PKG_NAME="cfwarden"
+export CF_WARDEN_PKG_VERSION="1ppa"$BUILD
+

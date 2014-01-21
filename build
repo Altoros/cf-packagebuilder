@@ -24,13 +24,16 @@ then
 fi
 
 # CF CLI
-#./scripts/cli
+./scripts/cli
 
 # CF Cloud Controller
-#./scripts/cloud_controller
+./scripts/cloud_controller
 
 # CF DEA
 ./scripts/dea
+
+# CF Warden
+./scripts/warden
 
 rm -rf /$INSTALL_FOLDER
 cd $original_folder

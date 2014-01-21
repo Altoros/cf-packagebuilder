@@ -1,0 +1,8 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: package_name
+Source: src
+
+Files: *
+Copyright: year Cloud Foundry
+License: license_name
+
