@@ -91,7 +91,7 @@ CF_JOBS=$CF_JOBS";gorouter:cfgorouterjob:cfgorouter"
 CF_JOBS=$CF_JOBS";hm9000:cfhm9000job:cfhm9000"
 #CF_JOBS=$CF_JOBS";login::"
 #CF_JOBS=$CF_JOBS";nats::"
-4CF_JOBS=$CF_JOBS";uaa:cfuaajob:cfuaa"
+CF_JOBS=$CF_JOBS";uaa:cfuaajob:cfuaa"
 export CF_JOBS
 
 

@@ -45,7 +45,7 @@ fi
 ./scripts/rootfs
 
 # CF Go-Router
-./scripts/rootfs
+./scripts/gorouter
 
 rm -rf /$INSTALL_FOLDER
 cd $original_folder
