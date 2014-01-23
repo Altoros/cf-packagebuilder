@@ -47,6 +47,9 @@ fi
 # CF Go-Router
 ./scripts/gorouter
 
+# CF hm9000
+./scripts/hm9000
+
 rm -rf /$INSTALL_FOLDER
 cd $original_folder
 

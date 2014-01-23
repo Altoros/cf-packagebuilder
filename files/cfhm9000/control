@@ -1,0 +1,13 @@
+Source: package_name
+Maintainer: maintainer
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 8.0.0)
+
+Package: package_name
+Version: app_version-ubuntu_version
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
+Description: Cloud Foundry Health Manager
+ The Health Manager is a daemon that periodically scans the Cloud Controller database for the expected state of applications that have been deployed and the VMs where they run.
+ The Health Manager compares expected state with actual state, and issues a message to the Cloud Controller when it detects a problem.

@@ -64,6 +64,11 @@ export CF_GOROUTER_REPO=https://github.com/cloudfoundry/gorouter.git
 export CF_GOROUTER_PKG_NAME="cfgorouter"
 export CF_GOROUTER_PKG_VERSION="1ppa"$BUILD
 
+# CF hm9000
+export CF_HM_REPO=https://github.com/cloudfoundry/hm9000.git
+export CF_HM_PKG_NAME="cfhm9000"
+export CF_HM_PKG_VERSION="1ppa"$BUILD
+
 # CF rootfs
 export CF_ROOTFS_PKG_NAME="cfrootfs"
 export CF_ROOTFS_PKG_VERSION="1ppa"$BUILD
