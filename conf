@@ -59,6 +59,11 @@ export CF_WARDEN_REPO=https://github.com/cloudfoundry/warden.git
 export CF_WARDEN_PKG_NAME="cfwarden"
 export CF_WARDEN_PKG_VERSION="1ppa"$BUILD
 
+# CF Go-Router
+export CF_GOROUTER_REPO=https://github.com/cloudfoundry/gorouter.git
+export CF_GOROUTER_PKG_NAME="cfgorouter"
+export CF_GOROUTER_PKG_VERSION="1ppa"$BUILD
+
 # CF rootfs
 export CF_ROOTFS_PKG_NAME="cfrootfs"
 export CF_ROOTFS_PKG_VERSION="1ppa"$BUILD
