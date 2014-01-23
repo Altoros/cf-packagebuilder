@@ -41,6 +41,9 @@ fi
 # CF Warden
 ./scripts/warden
 
+# CF rootfs
+./scripts/rootfs
+
 rm -rf /$INSTALL_FOLDER
 cd $original_folder
 
