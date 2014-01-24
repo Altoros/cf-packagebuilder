@@ -10,16 +10,12 @@ export SRC=$CF_CCONTROLLER_REPO
 source $LIB_FOLDER/begin
 git clone $SRC /$INSTALL_FOLDER/$PRJ
 cd /$INSTALL_FOLDER/$PRJ
+git reset --hard $CF_CCONTROLLER_SHA
 git submodule update --init --recursive
 bundle --standalone install
 
 echo "Getting version..."
-VERSION_LINE=`cat ./config/cloud_controller.yml | egrep -i -o '\s+version\s*:\s*(.+)'`
-VERSION=${VERSION_LINE//[!0-9]}
-if [ ! $VERSION ]; then
-  echo "Cannot extract Version"
-  exit 1
-fi
+VERSION=$GBL_VER
 PKG=$PRJ-$VERSION
 
 cd -

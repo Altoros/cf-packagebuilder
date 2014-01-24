@@ -10,6 +10,7 @@ export SRC=$CF_HM_REPO
 source $LIB_FOLDER/begin
 git clone $SRC /$INSTALL_FOLDER/$PRJ
 cd /$INSTALL_FOLDER/$PRJ
+git reset --hard $CF_HM_SHA
 git submodule update --init --recursive
 
 echo "Getting version..."

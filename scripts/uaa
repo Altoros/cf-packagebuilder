@@ -11,16 +11,13 @@ export SRC=$CF_UAA_REPO
 source $LIB_FOLDER/begin
 git clone $SRC /$INSTALL_FOLDER/$PRJ
 cd /$INSTALL_FOLDER/$PRJ
+git reset --hard $CF_UAA_SHA
 git submodule update --init --recursive
 mvn install
 find ./ -name .git* | xargs rm -rf
 
 echo "Getting version..."
-VERSION=`cat ./uaa/pom.xml | grep -m 1 -Po '(?<=<version>)(.*)(?=</version>)'`
-if [ ! $VERSION ]; then
-  echo "Cannot extract Version"
-  exit 1
-fi
+VERSION=$GBL_VER
 PKG=$PRJ-$VERSION
 
 cd -

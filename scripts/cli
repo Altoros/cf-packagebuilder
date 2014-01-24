@@ -13,12 +13,7 @@ export WORKDIR="cli"
 source $LIB_FOLDER/begin
 
 git clone $SRC $WORKDIR
-VERSION_LINE=`cat $WORKDIR/src/cf/app_constants.go | egrep -i -o 'Version\s*=\s*"([^"]+)"'`
-VERSION=`echo $(expr "$VERSION_LINE" : '.*"\([^"]*\)".*') | cut -d'-' -f 1`
-if [ ! $VERSION ]; then
-  echo "Cannot extract Version"
-  exit 1
-fi
+VERSION=$GBL_VER
 PKG=$PRJ-$VERSION
 mv $WORKDIR $PKG
 

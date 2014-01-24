@@ -15,28 +15,11 @@ export BUILDER_FOLDER="builder"
 export BUILDER=$current_folder/$BUILDER_FOLDER/build.rb
 echo "Cloning releases..."
 git clone $CF_JOBS_RELEASE_REPO ./$RELEASE_FOLDER
+cd ./$RELEASE_FOLDER
+git reset --hard $CF_RELEASE_SHA
+cd -
 echo "Cloning builder..."
 git clone $CF_JOBS_BUILDER_REPO ./$BUILDER_FOLDER
-
-echo "Getting release version..."
-VERSION_LINE=`tail -n 1 $RELEASE_FOLDER/releases/index.yml`
-VERSION=${VERSION_LINE//[!0-9]}
-if [ ! $VERSION ]; then
-  echo "Cannot extract Version"
-  exit 1
-fi
-echo "Getting jobs versions..."
-VERSION_FILE=$RELEASE_FOLDER/releases/cf-$VERSION.yml
-VERSIONS_STTRING=`$LIB_FOLDER/job_versions $VERSION_FILE`
-declare -A VERSIONS
-versions=(${VERSIONS_STTRING//;/ })
-for i in "${!versions[@]}"
-do
-  version=(${versions[i]//:/ })
-  version_name="${version[0]}"
-  version_value="${version[1]}"
-  VERSIONS+=( [$version_name]=$version_value )
-done
 
 cf_jobs=(${CF_JOBS//;/ })
 for i in "${!cf_jobs[@]}"
@@ -46,12 +29,7 @@ do
   PRJ="${cf_job[1]}"
   DEPENDS="${cf_job[2]}"
   echo "*** Packing $CF_JOB_FOLDER ***"
-  VERSION=${VERSIONS[$CF_JOB_FOLDER]}
-  if [[ ! $VERSION ]]
-  then
-    echo "Cannot find version for job $CF_JOB_FOLDER"
-    exit 1
-  fi
+  VERSION=$GBL_VER
   SOURCE=$current_folder/$RELEASE_FOLDER/jobs/$CF_JOB_FOLDER
   PKG=$PRJ-$VERSION
 
