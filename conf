@@ -17,7 +17,7 @@ export CF_UAA_SHA="2701cc8da708ac8fbdfe146e67c1375bab9f0cd9"
 export CF_DEA_SHA="fe425ff3bb69723398bbde8995f49077947d6fdc"
 export CF_WARDEN_SHA="2ec8afaa3a3fddd81c07c5db9ab8ef5dbdd20415"
 export CF_GOROUTER_SHA="451dfcfb31c64d46a635c75b3003a33fd9246274"
-export CF_HM_SHA="2813210da49a042b013e2b84250b2ca0ef4e3575"
+export CF_HM_SHA="a7c4a43a4944353e784e9eecf971978844e3b5e9"
 
 export CONF_FOLDER=$current_folder
 export LIB_FOLDER=$current_folder/lib
