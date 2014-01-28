@@ -31,16 +31,16 @@ deb_permissions /$INSTALL_FOLDER/$PRJ
 echo "Moving project into the package dir..."
 mv /$INSTALL_FOLDER/$PRJ ./$PKG/$INSTALL_FOLDER/
 
-echo "Creating man file for $f..."
-cp $FILES_FOLDER/$PRJ/man ./$PKG/usr/share/man/man1/$f.1
-sed -i "s|u_bin_name|${PRJ^^}|" ./$PKG/usr/share/man/man1/$f.1
-sed -i "s|day|$(date +%d)|" ./$PKG/usr/share/man/man1/$f.1
-sed -i "s|month|$(date +%B)|" ./$PKG/usr/share/man/man1/$f.1
-sed -i "s|year|$(date +%Y)|" ./$PKG/usr/share/man/man1/$f.1
-sed -i "s|bin_name|$PRJ|" ./$PKG/usr/share/man/man1/$f.1
-sed -i "s|prj_name|$DEPENDS|" ./$PKG/usr/share/man/man1/$f.1
-gzip -9 ./$PKG/usr/share/man/man1/$f.1
-chmod 0644 ./$PKG/usr/share/man/man1/$f.1.gz
+echo "Creating man file for $PRJ..."
+cp $FILES_FOLDER/$PRJ/man ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|u_bin_name|${PRJ^^}|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|day|$(date +%d)|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|month|$(date +%B)|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|year|$(date +%Y)|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|bin_name|$PRJ|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|prj_name|$DEPENDS|" ./$PKG/usr/share/man/man1/$PRJ.1
+gzip -9 ./$PKG/usr/share/man/man1/$PRJ.1
+chmod 0644 ./$PKG/usr/share/man/man1/$PRJ.1.gz
 
 echo "Making source packages..."
 cd ./$PKG/
