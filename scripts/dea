@@ -38,6 +38,11 @@ cd -
 echo "Moving project into the package dir..."
 mv /$INSTALL_FOLDER/$PRJ ./$PKG/$INSTALL_FOLDER/
 
+# delete test binary
+# dpkg: error processing /var/cache/apt/archives/cfdea.deb (--unpack):
+# trying to overwrite '/usr/bin/test', which is also in package coreutils 8.21-1ubuntu3
+rm ./$PKG/$INSTALL_FOLDER/$PRJ/bin/test
+
 # Copy binaries and make them executable
 for f in `find ./$PKG/$INSTALL_FOLDER/$PRJ/bin/ -type f -printf "%f\n"` 
 do
