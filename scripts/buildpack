@@ -1,11 +1,11 @@
 #!/bin/bash
 
 set -e
-echo "=== Packing rootfs ==="
+echo "=== Packing buildpack ==="
 
-export PRJ=$CF_ROOTFS_PKG_NAME
-export UBUNTU_VERSION=$CF_ROOTFS_PKG_VERSION
-export SRC=/tmp/rootfs.tgz
+export PRJ=$CF_BPKC_PKG_NAME
+export UBUNTU_VERSION=$CF_BPKC_PKG_VERSION
+export SRC=/tmp/buildpack_cache.tar.xz
 source $LIB_FOLDER/begin
 mkdir -p /$INSTALL_FOLDER/$PRJ
 cp $SRC /$INSTALL_FOLDER/$PRJ

@@ -10,4 +10,3 @@ Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
 Description: Cloud Foundry rootfs
  rootfs used by CF
- provides warden

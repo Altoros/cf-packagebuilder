@@ -44,6 +44,9 @@ fi
 # CF rootfs
 ./scripts/rootfs
 
+# CF buildpack cache
+./scripts/buildpack
+
 # CF Go-Router
 ./scripts/gorouter
 
