@@ -35,6 +35,9 @@ fi
 # CF UAA
 ./scripts/uaa
 
+# CF login server
+./scripts/login
+
 # CF DEA
 ./scripts/dea
 

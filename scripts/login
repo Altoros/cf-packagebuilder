@@ -1,0 +1,97 @@
+#!/bin/bash
+
+set -e
+echo "=== Installing Login Server ==="
+aptitude -y install maven libjavacc-maven-plugin-java openjdk-7-jdk openjdk-7-jre
+JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+
+export PRJ=$CF_LOGIN_PKG_NAME
+export UBUNTU_VERSION=$CF_LOGIN_PKG_VERSION
+export SRC=$CF_LOGIN_REPO
+source $LIB_FOLDER/begin
+git clone $SRC /$INSTALL_FOLDER/$PRJ
+cd /$INSTALL_FOLDER/$PRJ
+git reset --hard $CF_LOGIN_SHA
+git submodule update --init --recursive
+mvn clean install
+find ./ -name .git* | xargs rm -rf
+
+echo "Getting version..."
+VERSION=$GBL_VER
+PKG=$PRJ-$VERSION
+
+cd -
+echo "Building package structure..."
+deb_dir_structure . $PKG $PRJ
+mkdir -p ./$PKG/$INSTALL_FOLDER/
+echo "Getting dependencies..."
+DEPENDS="ruby | ruby-interpreter, ruby1.9.3, maven, libjavacc-maven-plugin-java, openjdk-7-jdk, openjdk-7-jre"
+
+echo "Set file permissions..."
+deb_permissions ./$PKG/
+deb_permissions /$INSTALL_FOLDER/$PRJ
+
+echo "Moving project into the package dir..."
+mv /$INSTALL_FOLDER/$PRJ ./$PKG/$INSTALL_FOLDER/
+
+echo "Making source packages..."
+cd ./$PKG/
+dh_make --createorig --packagename $PRJ"_"$VERSION --packageclass "s" --copyright "apache" --yes
+rm -rf debian
+mkdir debian
+
+echo "Copy rules and compat..."
+cp $FILES_FOLDER/$PRJ/compat ./debian/
+cp $FILES_FOLDER/$PRJ/rules ./debian/
+
+echo "Creating control file..."
+cp $FILES_FOLDER/$PRJ/control ./debian
+sed -i "s|package_name|$PRJ|g" ./debian/control
+sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/control
+sed -i "s/DEPENDENCIES/$DEPENDS/g" ./debian/control
+chmod 0644 ./debian/control
+
+echo "Creating changelog file..."
+cp $FILES_FOLDER/$PRJ/changelog ./debian
+sed -i "s|package_name|$PRJ|g" ./debian/changelog
+sed -i "s|distro|$DISTRO|g" ./debian/changelog
+sed -i "s|app_version-ubuntu_version|$VERSION-$UBUNTU_VERSION|g" ./debian/changelog
+sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/changelog
+sed -i "s|date|$(date -R)|g" ./debian/changelog
+chmod 0644 ./debian/changelog
+
+echo "Creating copyright file..."
+cp $FILES_FOLDER/$PRJ/copyright ./debian/
+sed -i "s|src|$SRC|g" ./debian/copyright
+sed -i "s|package_name|$PRJ|g" ./debian/copyright
+sed -i "s|year|$(date +%Y)|g" ./debian/copyright
+cp ./$INSTALL_FOLDER/$PRJ/LICENSE ./debian/copyright.tmp
+$LIB_FOLDER/replace_std_licenses ./debian/copyright.tmp
+sed -i 's|, 59 Temple Place - Suite 330,||g' ./debian/copyright.tmp
+sed -i 's|Boston, MA 02111-1307, USA.||g' ./debian/copyright.tmp
+sed -i 's|, 51 Franklin Street, Fifth Floor, Boston, MA||g' ./debian/copyright.tmp
+sed -i 's|02110-1301 USA.||g' ./debian/copyright.tmp
+$LIB_FOLDER/cf_cli_copyright ./debian/copyright.tmp ./debian/copyright
+rm ./debian/copyright.tmp
+rm ./$INSTALL_FOLDER/$PRJ/LICENSE
+chmod 0644 ./debian/copyright
+
+echo "Create Install script..."
+cp $FILES_FOLDER/$PRJ/install ./debian/$PRJ.install
+chmod 0644 ./debian/$PRJ.install
+
+echo "Building packages..."
+dpkg-buildpackage $DASH_S -rfakeroot
+if [[ $DASH_S == "" ]]
+then
+ lintian ../$PRJ"_"$VERSION-$UBUNTU_VERSION"_"amd64.deb
+fi
+
+echo "Moving packages to $PKGS_FOLDER..."
+cd ..
+rm -rf $PKG
+mv ./* $PKGS_FOLDER/
+echo "Done"
+
+source $LIB_FOLDER/end
+

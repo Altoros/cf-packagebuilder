@@ -14,6 +14,7 @@ export GBL_VER=153
 export CF_RELEASE_SHA="1589ac0bbf450213b5d1ef99857254fdbbbdd691"
 export CF_CCONTROLLER_SHA="99bfae3dcc96c092d4d26ee16f1857c67e78a4eb"
 export CF_UAA_SHA="2701cc8da708ac8fbdfe146e67c1375bab9f0cd9"
+export CF_LOGIN_SHA="b864301be1b2d41d87a4b83b77b440cf4892d4b9"
 export CF_DEA_SHA="fe425ff3bb69723398bbde8995f49077947d6fdc"
 export CF_WARDEN_SHA="2ec8afaa3a3fddd81c07c5db9ab8ef5dbdd20415"
 export CF_GOROUTER_SHA="451dfcfb31c64d46a635c75b3003a33fd9246274"
@@ -26,6 +27,7 @@ export PKGS_FOLDER=$current_folder/pkgs
 export FILES_FOLDER=$current_folder/files
 export SCRIPTS_FOLDER=$current_folder/scripts
 export INSTALL_FOLDER="var/lib/cloudfoundry"
+
 if [ ! -d "$TMP_FOLDER" ]; then
   mkdir $TMP_FOLDER
 fi
@@ -57,6 +59,11 @@ export CF_CCONTROLLER_PKG_VERSION="1ppa"$BUILD
 export CF_UAA_REPO=https://github.com/cloudfoundry/uaa.git
 export CF_UAA_PKG_NAME="cfuaa"
 export CF_UAA_PKG_VERSION="1ppa"$BUILD
+
+# CF UAA
+export CF_LOGIN_REPO=https://github.com/cloudfoundry/login-server.git
+export CF_LOGIN_PKG_NAME="cflogin"
+export CF_LOGIN_PKG_VERSION="1ppa"$BUILD
   
 # CF DEA
 export CF_DEA_REPO=https://github.com/cloudfoundry/dea_ng.git
@@ -107,7 +114,7 @@ CF_JOBS="cloud_controller_ng:cfcloudcontrollerjob:cfcloudcontroller"
 CF_JOBS=$CF_JOBS";dea_next:cfdeajob:cfdea"
 CF_JOBS=$CF_JOBS";gorouter:cfgorouterjob:cfgorouter"
 CF_JOBS=$CF_JOBS";hm9000:cfhm9000job:cfhm9000"
-#CF_JOBS=$CF_JOBS";login::"
+CF_JOBS=$CF_JOBS";login:cfloginjob:cflogin"
 #CF_JOBS=$CF_JOBS";nats::"
 CF_JOBS=$CF_JOBS";uaa:cfuaajob:cfuaa"
 export CF_JOBS
