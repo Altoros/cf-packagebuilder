@@ -1,0 +1,12 @@
+Source: package_name
+Maintainer: maintainer
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 8.0.0)
+
+Package: package_name
+Version: app_version-ubuntu_version
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
+Description: Cloud Foundry rootfs
+ rootfs used by CF

@@ -1,0 +1,101 @@
+#!/bin/bash
+
+set -e
+echo "=== Packing buildpack ==="
+
+export PRJ=$CF_BPKC_PKG_NAME
+export UBUNTU_VERSION=$CF_BPKC_PKG_VERSION
+export SRC=/tmp/buildpack_cache.tar.xz
+source $LIB_FOLDER/begin
+mkdir -p /$INSTALL_FOLDER/$PRJ
+cp $SRC /$INSTALL_FOLDER/$PRJ
+cd /$INSTALL_FOLDER/$PRJ
+
+echo "Getting version..."
+VERSION=$GBL_VER
+PKG=$PRJ-$VERSION
+
+cd -
+echo "Building package structure..."
+deb_dir_structure . $PKG $PRJ
+mkdir -p ./$PKG/$INSTALL_FOLDER/
+echo "Getting dependencies..."
+DEPENDS="tar"
+
+echo "Set file permissions..."
+deb_permissions ./$PKG/
+deb_permissions /$INSTALL_FOLDER/$PRJ
+
+echo "Moving project into the package dir..."
+mv /$INSTALL_FOLDER/$PRJ ./$PKG/$INSTALL_FOLDER/
+
+echo "Creating man file for $PRJ..."
+cp $FILES_FOLDER/$PRJ/man ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|u_bin_name|${PRJ^^}|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|day|$(date +%d)|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|month|$(date +%B)|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|year|$(date +%Y)|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|bin_name|$PRJ|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|prj_name|$DEPENDS|" ./$PKG/usr/share/man/man1/$PRJ.1
+gzip -9 ./$PKG/usr/share/man/man1/$PRJ.1
+chmod 0644 ./$PKG/usr/share/man/man1/$PRJ.1.gz
+
+echo "Making source packages..."
+cd ./$PKG/
+dh_make --createorig --packagename $PRJ"_"$VERSION --packageclass "s" --copyright "apache" --yes
+rm -rf debian
+mkdir debian
+
+echo "Copy rules and compat..."
+cp $FILES_FOLDER/$PRJ/compat ./debian/
+cp $FILES_FOLDER/$PRJ/rules ./debian/
+
+echo "Creating control file..."
+cp $FILES_FOLDER/$PRJ/control ./debian
+sed -i "s|package_name|$PRJ|g" ./debian/control
+sed -i "s|app_version-ubuntu_version|$VERSION-$UBUNTU_VERSION|g" ./debian/control
+sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/control
+sed -i "s/DEPENDENCIES/$DEPENDS/g" ./debian/control
+chmod 0644 ./debian/control
+
+echo "Creating changelog file..."
+cp $FILES_FOLDER/$PRJ/changelog ./debian
+sed -i "s|package_name|$PRJ|g" ./debian/changelog
+sed -i "s|distro|$DISTRO|g" ./debian/changelog
+sed -i "s|app_version-ubuntu_version|$VERSION-$UBUNTU_VERSION|g" ./debian/changelog
+sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/changelog
+sed -i "s|date|$(date -R)|g" ./debian/changelog
+chmod 0644 ./debian/changelog
+
+echo "Creating copyright file..."
+cp $FILES_FOLDER/$PRJ/copyright ./debian/
+sed -i "s|src|$SRC|g" ./debian/copyright
+sed -i "s|package_name|$PRJ|g" ./debian/copyright
+sed -i "s|year|$(date +%Y)|g" ./debian/copyright
+chmod 0644 ./debian/copyright
+
+echo "Creating postinstall... "
+cp $FILES_FOLDER/$PRJ/postinst ./debian/
+sed -i "s|install_folder|$INSTALL_FOLDER|" ./debian/postinst
+sed -i "s|prj_name|$PRJ|" ./debian/postinst
+chmod 0755 ./debian/postinst
+
+echo "Create Install script..."
+cp $FILES_FOLDER/$PRJ/install ./debian/$PRJ.install
+chmod 0644 ./debian/$PRJ.install
+
+echo "Building packages..."
+dpkg-buildpackage $DASH_S -rfakeroot
+if [[ $DASH_S == "" ]]
+then
+  lintian ../$PRJ"_"$VERSION-$UBUNTU_VERSION"_"amd64.deb
+fi
+
+echo "Moving packages to $PKGS_FOLDER..."
+cd ..
+rm -rf $PKG
+mv ./* $PKGS_FOLDER/
+echo "Done"
+
+source $LIB_FOLDER/end
+

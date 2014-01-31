@@ -1,0 +1,15 @@
+Source: package_name
+Maintainer: maintainer
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 8.0.0)
+
+Package: package_name
+Version: app_version-ubuntu_version
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
+Description: Cloud Foundry buildpack
+ A buildpack is a set of scripts that Cloud Foundry runs on an application package to create a droplet that contains everthing the application needs to run.
+ (This process is referred to as staging.) A buildpack is specific to a particular framework or runtime environment.
+ Cloud Foundry includes buildpacks for Ruby, Java, and Node.js; when you upload an application, Cloud Foundry examines the application artifacts to determine which buildpack to apply.
+ Cloud Foundry can use remote buildpacks as well; you can specify the URL of the desired buildpack when running the cf push command.

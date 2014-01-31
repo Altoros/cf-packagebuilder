@@ -1,0 +1,122 @@
+#!/bin/bash
+
+if [ `whoami` != root ]; then
+  echo "Please run this script as root."
+  exit 1;
+fi
+
+# Global vars
+
+export BUILD=1
+
+export GBL_VER=153
+
+export CF_RELEASE_SHA="1589ac0bbf450213b5d1ef99857254fdbbbdd691"
+export CF_CCONTROLLER_SHA="99bfae3dcc96c092d4d26ee16f1857c67e78a4eb"
+export CF_UAA_SHA="2701cc8da708ac8fbdfe146e67c1375bab9f0cd9"
+export CF_LOGIN_SHA="b864301be1b2d41d87a4b83b77b440cf4892d4b9"
+export CF_DEA_SHA="fe425ff3bb69723398bbde8995f49077947d6fdc"
+export CF_WARDEN_SHA="2ec8afaa3a3fddd81c07c5db9ab8ef5dbdd20415"
+export CF_GOROUTER_SHA="451dfcfb31c64d46a635c75b3003a33fd9246274"
+export CF_HM_SHA="a7c4a43a4944353e784e9eecf971978844e3b5e9"
+
+export CONF_FOLDER=$current_folder
+export LIB_FOLDER=$current_folder/lib
+export TMP_FOLDER=$current_folder/tmp
+export PKGS_FOLDER=$current_folder/pkgs
+export FILES_FOLDER=$current_folder/files
+export SCRIPTS_FOLDER=$current_folder/scripts
+export INSTALL_FOLDER="var/lib/cloudfoundry"
+
+if [ ! -d "$TMP_FOLDER" ]; then
+  mkdir $TMP_FOLDER
+fi
+if [ ! -d "$PKGS_FOLDER" ]; then
+  mkdir $PKGS_FOLDER
+fi
+if [[ $1 == "deb" ]]
+then
+  export DASH_S=""
+else
+  export DASH_S="-S"
+fi
+
+export MAINTAINER_EMAIL="Cloud Foundry <cf-charm@altoros.com>"
+#export DISTRO=saucy # 13.10
+export DISTRO=trusty # 14.04
+
+# Cloudfoundry CLI
+export CF_CLI_REPO=https://github.com/cloudfoundry/cli.git
+export CF_CLI_PKG_NAME="cfcli"
+export CF_CLI_PKG_VERSION="1ppa"$BUILD
+
+# CF Cloud Controller
+export CF_CCONTROLLER_REPO=https://github.com/cloudfoundry/cloud_controller_ng.git
+export CF_CCONTROLLER_PKG_NAME="cfcloudcontroller"
+export CF_CCONTROLLER_PKG_VERSION="1ppa"$BUILD
+
+# CF UAA
+export CF_UAA_REPO=https://github.com/cloudfoundry/uaa.git
+export CF_UAA_PKG_NAME="cfuaa"
+export CF_UAA_PKG_VERSION="1ppa"$BUILD
+
+# CF UAA
+export CF_LOGIN_REPO=https://github.com/cloudfoundry/login-server.git
+export CF_LOGIN_PKG_NAME="cflogin"
+export CF_LOGIN_PKG_VERSION="1ppa"$BUILD
+  
+# CF DEA
+export CF_DEA_REPO=https://github.com/cloudfoundry/dea_ng.git
+export CF_DEA_PKG_NAME="cfdea"
+export CF_DEA_PKG_VERSION="1ppa"$BUILD
+
+# CF Warden
+export CF_WARDEN_REPO=https://github.com/cloudfoundry/warden.git
+export CF_WARDEN_PKG_NAME="cfwarden"
+export CF_WARDEN_PKG_VERSION="1ppa"$BUILD
+
+# CF Go-Router
+export CF_GOROUTER_REPO=https://github.com/cloudfoundry/gorouter.git
+export CF_GOROUTER_PKG_NAME="cfgorouter"
+export CF_GOROUTER_PKG_VERSION="1ppa"$BUILD
+
+# CF hm9000
+export CF_HM_REPO=https://github.com/cloudfoundry/hm9000.git
+export CF_HM_PKG_NAME="cfhm9000"
+export CF_HM_PKG_VERSION="1ppa"$BUILD
+
+# CF rootfs
+export CF_ROOTFS_PKG_NAME="cfrootfs"
+export CF_ROOTFS_PKG_VERSION="1ppa"$BUILD
+
+# CF buildpack cache
+export CF_BPKC_PKG_NAME="cfbuildpackcache"
+export CF_BPKC_PKG_VERSION="1ppa"$BUILD
+
+# Jobs
+export CF_JOBS_RELEASE_REPO=https://github.com/cloudfoundry/cf-release.git
+export CF_JOBS_BUILDER_REPO=https://github.com/Altoros/cf-job2package-tool.git
+export CF_JOBS_PKG_VERSION="1ppa"$BUILD
+
+# Example:
+#   CF_JOBS=cloud_controller_ng:cfcloudcontrollerjob:cfcloudcontroller;uaa:cfuaajob:cfuaa
+# Format:
+#   Each job must be described as: 
+#     job folder name, job package name, dependency package name
+#     job folder name         - folder in https://github.com/cloudfoundry/cf-release/tree/master/jobs
+#     job package name        - package name which will be used during packing the job
+#     dependency package name - package which will be set as dependency for the job, 
+#                               and it will be used as install folder
+# Synrax: 
+#   ; job delimiter
+#   : values delimiter
+CF_JOBS="cloud_controller_ng:cfcloudcontrollerjob:cfcloudcontroller"
+CF_JOBS=$CF_JOBS";dea_next:cfdeajob:cfdea"
+CF_JOBS=$CF_JOBS";gorouter:cfgorouterjob:cfgorouter"
+CF_JOBS=$CF_JOBS";hm9000:cfhm9000job:cfhm9000"
+CF_JOBS=$CF_JOBS";login:cfloginjob:cflogin"
+#CF_JOBS=$CF_JOBS";nats::"
+CF_JOBS=$CF_JOBS";uaa:cfuaajob:cfuaa"
+export CF_JOBS
+
+

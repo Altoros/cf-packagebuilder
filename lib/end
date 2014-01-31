@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cd $original_folder
+
+if [ -d "$TMP_FOLDER/$PRJ" ]; then
+  rm -rf $TMP_FOLDER/$PRJ
+fi
+

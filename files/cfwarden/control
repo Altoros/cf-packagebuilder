@@ -1,0 +1,15 @@
+Source: package_name
+Maintainer: maintainer
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 8.0.0)
+
+Package: package_name
+Version: app_version-ubuntu_version
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
+Description: Cloud Foundry Warden
+ Warden is a framework within Cloud Foundry for creating and managing isolated environments on Unix.
+ Warden provides an API and a command line interface for creating and managing containers within a VM.
+ Containers created by Warden can be limited in terms of network access as well as CPU, memory, and disk usage.
+ provides warden

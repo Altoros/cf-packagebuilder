@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $license_file = $ARGV[0];
+my $copyright_file = $ARGV[1];
+
+my $copyright = '';
+my $copyright_size = -s $copyright_file;
+open(F,$copyright_file) || die "Cannot open ".$copyright_file;
+unless( read(F,$copyright,$copyright_size) == $copyright_size)
+{
+  die("Reading error: ".$copyright_file);
+}
+close(F);
+
+open(F,$license_file) || die "Cannot open ".$license_file;
+open(C,">".$copyright_file) || die "Cannot write copryght file: ".$copyright_file;
+
+my $i = 0;
+my $string = '';
+my $license_name = '';
+while(<F>)
+{
+  $string = trim($_);
+  if( $i < 2 )
+  {
+    $license_name.=$string;
+  }
+  if( $i == 3)
+  {
+    $copyright =~ s/license_name/$license_name/e;
+    print C $copyright;
+    do
+    {
+      $_=<F>;
+      $string = trim($_);
+      $i++;
+    }
+    while(length($string)==0);
+  }
+  if( $i > 3 )
+  {
+    print C " ";
+    if( length($string)>0 )
+    {
+      print C $string;
+    }
+    else
+    {
+      print C ".";
+    }
+    print C "\n";
+  }
+  $i++;
+}
+
+close(F);
+close(C);
+
+sub trim
+{
+  my $string = @_[0];
+  chomp($string);
+  $string =~ s/^\s+//;
+  $string =~ s/\s+$//;
+  return $string
+}

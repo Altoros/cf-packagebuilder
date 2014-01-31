@@ -1,0 +1,8 @@
+.\" MAN PAGE
+.TH u_bin_name 1 "month day, year"
+.SH NAME
+bin_name \- Cloud Foundry rootfs
+.SH DESCRIPTION
+.IP
+Cloud Foundry rootfs
+

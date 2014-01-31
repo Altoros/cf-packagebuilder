@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $copyright_file = $ARGV[0];
+
+my %LICENSES = ();
+my $base = "/usr/share/common-licenses/";
+opendir(D,$base);
+my @dir = readdir(D);
+closedir(D);
+foreach my $f (@dir)
+{
+  $f = $base.$f;
+  if(-f $f)
+  {
+    $LICENSES{'file'} = $f;
+    open(F,$f) || die "Cannot open ".$f." for reading";
+    license_file(\*F,undef,\&set_license_header,\&set_license_body);
+    close(F)
+  }
+}
+
+my $copyright = '';
+my $copyright_file_tmp = $copyright_file.".tmp";
+open(C,$copyright_file) || die "Cannot open ".$copyright_file;
+open(F,">".$copyright_file_tmp) || die "Cannot write copryght file: ".$copyright_file_tmp;
+
+while(<C>)
+{
+  my $string = trim($_);
+  if(exists($LICENSES{$string}))
+  {
+    license_file(\*C,$string,\&check_license_header,\&check_license_body);
+    print F $LICENSES{'print'};
+  }
+  else
+  {
+    print F $string,"\n" || die "Cannot write ".$copyright_file_tmp;
+  }
+}
+
+close(F);
+close(C);
+unlink($copyright_file);
+rename($copyright_file_tmp,$copyright_file);
+
+#------------------------------------------------------------------------------
+sub check_license_header
+{
+  my ($name,$version) = @_;
+  if(exists($LICENSES{$name}) && exists($LICENSES{$name}{$version}))
+  {
+    $LICENSES{'current'} = $LICENSES{$name}{$version};
+    return 1;
+  }
+  return 0;
+}
+#------------------------------------------------------------------------------
+sub check_license_body
+{
+  my ($string) = @_;
+  if( ${$LICENSES{'current'}->{'lines'}}[$LICENSES{'i'}++] eq $string )
+  {
+    if($LICENSES{'i'} == scalar(@{$LICENSES{'current'}->{'lines'}}))
+    {
+      $LICENSES{'print'} .= "\n".$LICENSES{'current'}->{'path'}."\n";
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+  else
+  {
+    $LICENSES{'print'} .= $LICENSES{'body'};
+    return 1;
+  }
+}
+#------------------------------------------------------------------------------
+sub set_license_header
+{
+  my ($name,$version) = @_;
+  $LICENSES{$name}{$version}{'path'} = $LICENSES{'file'};
+  @{$LICENSES{$name}{$version}{'lines'}} = ();
+  $LICENSES{'current'} = $LICENSES{$name}{$version}{'lines'};
+  return 1;
+}
+#------------------------------------------------------------------------------
+sub set_license_body
+{
+  my ($string) = @_;
+  push(@{$LICENSES{'current'}},$string);
+  return 0;
+}
+#------------------------------------------------------------------------------
+sub license_file
+{
+  my ($file,$string,$header,$body) = @_;
+  $LICENSES{'i'} = 0;
+  $LICENSES{'print'} = '';
+  while(!length($string))
+  {
+    $_=<$file>;
+    $string = trim($_);
+  }
+  $_ = <$file>;
+  my $version=trim($_);
+  $LICENSES{'print'} .= $string."\n".$version."\n";
+  if( &{$header}($string,$version) )
+  {
+    my $skip_optional=1;
+    my $stop=0;
+    while(!$stop)
+    {
+      if(eof($file))
+      {
+        last;
+      }
+      $_=<$file>;
+      $string = trim($_);
+      if($skip_optional)
+      {
+        $LICENSES{'print'} .= $string."\n";
+        if(!length($string))
+        {
+          $skip_optional=0;
+        }
+      }
+      if(!$skip_optional)
+      {
+        if(length($string))
+        {
+          $LICENSES{'body'} .= $string."\n";
+          $string =~ s/[\s\t]+/ /g;
+          $stop = &{$body}($string);
+        }
+      }
+    }
+  }
+}
+#------------------------------------------------------------------------------
+sub trim
+{
+  my $string = @_[0];
+  chomp($string);
+  $string =~ s/^[\s\t]+//;
+  $string =~ s/[\s\t]+$//;
+  return $string
+}
+#------------------------------------------------------------------------------
+

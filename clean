@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+original_folder=`pwd`
+cd $(dirname $0)
+current_folder=`pwd`
+source ./conf
+
+rm -rf $TMP_FOLDER/*
+rm -rf $PKGS_FOLDER/*
+
+cd $original_folder
+

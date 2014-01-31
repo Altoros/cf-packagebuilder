@@ -1,0 +1,12 @@
+Source: package_name
+Maintainer: maintainer
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 8.0.0)
+
+Package: package_name
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
+Description: Cloud Foundry Job for DEPENDENCIES package
+ Cloud Foundry Job for DEPENDENCIES package (dependency package).
+

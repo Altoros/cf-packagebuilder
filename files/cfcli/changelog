@@ -1,0 +1,5 @@
+package_name (app_version-ubuntu_version) distro; urgency=low
+
+  * Initial release 
+
+ -- maintainer  date
