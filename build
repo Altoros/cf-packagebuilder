@@ -62,9 +62,3 @@ fi
 rm -rf /$INSTALL_FOLDER
 cd $original_folder
 
-#cd ${BOSH_INSTALL_TARGET}
-#cp -a ${BOSH_COMPILE_TARGET}/vcap-common vcap-common
-#cd vcap-common
-#/var/vcap/packages/ruby/bin/bundle install --local --deployment --without=development test
-#среда, 12 февраля 2014 г.
-#[15:17:22] Alexander Borovsky - Altoros: https://github.com/cloudfoundry/cf-release/tree/master/src/cf-registrar-bundle-for-identity
