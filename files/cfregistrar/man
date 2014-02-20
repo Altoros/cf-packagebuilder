@@ -1,0 +1,8 @@
+.\" MAN PAGE
+.TH u_bin_name 1 "month day, year"
+.SH NAME
+bin_name \- Cloud Foundry cloud controller executable
+.SH DESCRIPTION
+.IP
+For details please look at /install_folder/prj_name/README.md
+

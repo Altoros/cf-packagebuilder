@@ -23,39 +23,48 @@ then
   set -e
 fi
 
-# CF CLI
-./scripts/cli
+## CF CLI
+#./scripts/cli
 
-# CF Cloud Controller
-./scripts/cloud_controller
+## CF Cloud Controller
+#./scripts/cloud_controller
 
-# CF JOBS
-./scripts/jobs
+## CF JOBS
+#./scripts/jobs
 
 # CF UAA
 ./scripts/uaa
 
-# CF login server
-./scripts/login
+# CF VCAP
+./scripts/registrar
 
-# CF DEA
-./scripts/dea
+## CF login server
+#./scripts/login
 
-# CF Warden
-./scripts/warden
+## CF DEA
+#./scripts/dea
 
-# CF rootfs
-./scripts/rootfs
+## CF Warden
+#./scripts/warden
 
-# CF buildpack cache
-./scripts/buildpack
+## CF rootfs
+#./scripts/rootfs
 
-# CF Go-Router
-./scripts/gorouter
+## CF buildpack cache
+#./scripts/buildpack
 
-# CF hm9000
-./scripts/hm9000
+## CF Go-Router
+#./scripts/gorouter
+
+## CF hm9000
+#./scripts/hm9000
 
 rm -rf /$INSTALL_FOLDER
 cd $original_folder
 
+#cd ${BOSH_INSTALL_TARGET}
+#cp -a ${BOSH_COMPILE_TARGET}/vcap-common vcap-common
+#cd vcap-common
+#/var/vcap/packages/ruby/bin/bundle install --local --deployment --without=development test
+#среда, 12 февраля 2014 г.
+#[15:17:22] Alexander Borovsky - Altoros: https://github.com/cloudfoundry/cf-release/tree/master/src/cf-registrar-bundle-for-identity

@@ -1,43 +1,18 @@
 #!/bin/bash
 
 set -e
-echo "=== Installing UAA ==="
-aptitude -y install ruby1.9.3 ruby-bundler openjdk-7-jdk tomcat7
-JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+echo "=== Installing CF Register (vcap-common) ==="
+aptitude -y install ruby1.9.3 ruby-bundler
 
-export PRJ=$CF_UAA_PKG_NAME
-export UBUNTU_VERSION=$CF_UAA_PKG_VERSION
-export SRC=$CF_UAA_REPO
+export PRJ=$CF_REGISTAR_PKG_NAME
+export UBUNTU_VERSION=$CF_REGISTAR_PKG_VERSION
+export SRC=$CF_REGISTAR_REPO
 source $LIB_FOLDER/begin
 
-export RELEASE_FOLDER="release"
-echo "Cloning releases..."
-git clone $CF_RELEASE_REPO ./$RELEASE_FOLDER
-cd ./$RELEASE_FOLDER
-git reset --hard $CF_RELEASE_SHA
-cd -
-
-URLS_STRING=`$LIB_FOLDER/blob_release $RELEASE_FOLDER/config/blobs.yml $CF_UAA_TOMCAT $CF_UAA_ROOT $CF_UAA_BATCH $CF_UAA_VARZ`
-urls=(${URLS_STRING//;/ })
-  
-mkdir -p /$INSTALL_FOLDER/$PRJ
+git clone $SRC /$INSTALL_FOLDER/$PRJ
 cd /$INSTALL_FOLDER/$PRJ
-
-# install Tomcat
-wget ${urls[0]} -O tomcat.tar.gz
-tar xzf tomcat.tar.gz
-rm -f tomcat.tar.gz
-mv `find ./ -name apache-tomcat*` tomcat
-tar cf tomcat.tar ./tomcat/lib ./tomcat/bin
-rm -rf tomcat/LICENSE
-rm -rf tomcat/webapps/*
-rm -rf tomcat/bin
-rm -rf tomcat/lib
-
-# install UAA pieces
-wget ${urls[1]} -O ./tomcat/webapps/ROOT.war
-wget ${urls[2]} -O ./tomcat/webapps/batch.war
-wget ${urls[3]} -O ./tomcat/webapps/varz.war
+git submodule update --init --recursive
+bundle --standalone install
 
 echo "Getting version..."
 VERSION=$GBL_VER
@@ -47,16 +22,46 @@ cd -
 echo "Building package structure..."
 deb_dir_structure . $PKG $PRJ
 mkdir -p ./$PKG/$INSTALL_FOLDER/
-
 echo "Getting dependencies..."
-DEPENDS="openjdk-7-jdk, tomcat7"
+DEPENDS="ruby | ruby-interpreter, ruby1.9.3, ruby-bundler"
 
 echo "Set file permissions..."
 deb_permissions ./$PKG/
 deb_permissions /$INSTALL_FOLDER/$PRJ
 
+echo "Packing gems..."
+cd /$INSTALL_FOLDER/$PRJ
+tar czf bundle.tar.gz bundle .bundle .git .gitignore
+rm -rf bundle .bundle .git .gitignore
+cd -
+
 echo "Moving project into the package dir..."
 mv /$INSTALL_FOLDER/$PRJ ./$PKG/$INSTALL_FOLDER/
+
+# Copy binaries and make them executable
+for f in `find ./$PKG/$INSTALL_FOLDER/$PRJ/bin/ -type f -printf "%f\n"` 
+do
+echo "Wrapping ./bin/$f..."
+cat<<EOL > ./$PKG/usr/bin/$f
+#!/bin/sh
+
+BUNDLE_GEMFILE=/$INSTALL_FOLDER/$PRJ/Gemfile bundle exec /$INSTALL_FOLDER/$PRJ/bin/$f
+
+EOL
+chmod 0755 ./$PKG/usr/bin/$f
+# mans
+echo "Creating man file for $f..."
+cp $FILES_FOLDER/$PRJ/man ./$PKG/usr/share/man/man1/$f.1
+sed -i "s|u_bin_name|${f^^}|" ./$PKG/usr/share/man/man1/$f.1
+sed -i "s|day|$(date +%d)|" ./$PKG/usr/share/man/man1/$f.1
+sed -i "s|month|$(date +%B)|" ./$PKG/usr/share/man/man1/$f.1
+sed -i "s|year|$(date +%Y)|" ./$PKG/usr/share/man/man1/$f.1
+sed -i "s|bin_name|$f|" ./$PKG/usr/share/man/man1/$f.1
+sed -i "s|install_folder|$INSTALL_FOLDER|" ./$PKG/usr/share/man/man1/$f.1
+sed -i "s|prj_name|$PRJ|" ./$PKG/usr/share/man/man1/$f.1
+gzip -9 ./$PKG/usr/share/man/man1/$f.1
+chmod 0644 ./$PKG/usr/share/man/man1/$f.1.gz
+done
 
 echo "Making source packages..."
 cd ./$PKG/
@@ -89,6 +94,16 @@ cp $FILES_FOLDER/$PRJ/copyright ./debian/
 sed -i "s|src|$SRC|g" ./debian/copyright
 sed -i "s|package_name|$PRJ|g" ./debian/copyright
 sed -i "s|year|$(date +%Y)|g" ./debian/copyright
+cp ./$INSTALL_FOLDER/$PRJ/LICENSE ./debian/copyright.tmp
+$LIB_FOLDER/replace_std_licenses ./debian/copyright.tmp
+sed -i 's|, 59 Temple Place - Suite 330,||g' ./debian/copyright.tmp
+sed -i 's|Boston, MA 02111-1307, USA.||g' ./debian/copyright.tmp
+sed -i 's|, 51 Franklin Street, Fifth Floor, Boston, MA||g' ./debian/copyright.tmp
+sed -i 's|02110-1301 USA.||g' ./debian/copyright.tmp
+sed -i 's|, 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA||g' ./debian/copyright.tmp
+$LIB_FOLDER/cf_cli_copyright ./debian/copyright.tmp ./debian/copyright
+rm ./debian/copyright.tmp
+rm ./$INSTALL_FOLDER/$PRJ/LICENSE
 chmod 0644 ./debian/copyright
 
 echo "Creating postinstall... "
@@ -111,7 +126,7 @@ echo "Building packages..."
 dpkg-buildpackage $DASH_S -rfakeroot
 if [[ $DASH_S == "" ]]
 then
- lintian ../$PRJ"_"$VERSION-$UBUNTU_VERSION"_"amd64.deb
+  lintian ../$PRJ"_"$VERSION-$UBUNTU_VERSION"_"amd64.deb
 fi
 
 echo "Moving packages to $PKGS_FOLDER..."

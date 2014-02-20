@@ -7,13 +7,14 @@ fi
 
 # Global vars
 
-export BUILD=1
+export BUILD=3
 
 export GBL_VER=153
 
+export CF_RELEASE_REPO=https://github.com/cloudfoundry/cf-release.git
 export CF_RELEASE_SHA="1589ac0bbf450213b5d1ef99857254fdbbbdd691"
 export CF_CCONTROLLER_SHA="99bfae3dcc96c092d4d26ee16f1857c67e78a4eb"
-export CF_UAA_SHA="2701cc8da708ac8fbdfe146e67c1375bab9f0cd9"
+#export CF_UAA_SHA="2701cc8da708ac8fbdfe146e67c1375bab9f0cd9"
 export CF_LOGIN_SHA="b864301be1b2d41d87a4b83b77b440cf4892d4b9"
 export CF_DEA_SHA="fe425ff3bb69723398bbde8995f49077947d6fdc"
 export CF_WARDEN_SHA="2ec8afaa3a3fddd81c07c5db9ab8ef5dbdd20415"
@@ -56,11 +57,19 @@ export CF_CCONTROLLER_PKG_NAME="cfcloudcontroller"
 export CF_CCONTROLLER_PKG_VERSION="1ppa"$BUILD
 
 # CF UAA
-export CF_UAA_REPO=https://github.com/cloudfoundry/uaa.git
+export CF_UAA_ROOT=uaa/cloudfoundry-identity-uaa
+export CF_UAA_BATCH=uaa/cloudfoundry-identity-batch
+export CF_UAA_VARZ=uaa/cloudfoundry-identity-varz
+export CF_UAA_TOMCAT=uaa/tomcat
 export CF_UAA_PKG_NAME="cfuaa"
 export CF_UAA_PKG_VERSION="1ppa"$BUILD
 
-# CF UAA
+# CF Registrar (VCAP-COMMON)
+export CF_REGISTAR_REPO=https://github.com/cloudfoundry/cf-registrar.git
+export CF_REGISTAR_PKG_NAME="cfregistrar"
+export CF_REGISTAR_PKG_VERSION="1ppa"$BUILD
+
+# CF Login
 export CF_LOGIN_REPO=https://github.com/cloudfoundry/login-server.git
 export CF_LOGIN_PKG_NAME="cflogin"
 export CF_LOGIN_PKG_VERSION="1ppa"$BUILD
@@ -94,7 +103,7 @@ export CF_BPKC_PKG_NAME="cfbuildpackcache"
 export CF_BPKC_PKG_VERSION="1ppa"$BUILD
 
 # Jobs
-export CF_JOBS_RELEASE_REPO=https://github.com/cloudfoundry/cf-release.git
+export CF_JOBS_RELEASE_REPO=$CF_RELEASE_REPO
 export CF_JOBS_BUILDER_REPO=https://github.com/Altoros/cf-job2package-tool.git
 export CF_JOBS_PKG_VERSION="1ppa"$BUILD
 
