@@ -23,14 +23,14 @@ then
   set -e
 fi
 
-## CF CLI
-#./scripts/cli
+# CF CLI
+./scripts/cli
 
-## CF Cloud Controller
-#./scripts/cloud_controller
+# CF Cloud Controller
+./scripts/cloud_controller
 
-## CF JOBS
-#./scripts/jobs
+# CF JOBS
+./scripts/jobs
 
 # CF UAA
 ./scripts/uaa
@@ -38,26 +38,26 @@ fi
 # CF VCAP
 ./scripts/registrar
 
-## CF login server
-#./scripts/login
+# CF login server
+./scripts/login
 
-## CF DEA
-#./scripts/dea
+# CF DEA
+./scripts/dea
 
-## CF Warden
-#./scripts/warden
+# CF Warden
+./scripts/warden
 
-## CF rootfs
-#./scripts/rootfs
+# CF rootfs
+./scripts/rootfs
 
-## CF buildpack cache
-#./scripts/buildpack
+# CF buildpack cache
+./scripts/buildpack
 
-## CF Go-Router
-#./scripts/gorouter
+# CF Go-Router
+./scripts/gorouter
 
-## CF hm9000
-#./scripts/hm9000
+# CF hm9000
+./scripts/hm9000
 
 rm -rf /$INSTALL_FOLDER
 cd $original_folder
