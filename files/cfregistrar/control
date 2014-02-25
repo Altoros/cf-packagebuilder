@@ -1,0 +1,14 @@
+Source: package_name
+Maintainer: maintainer
+Section: admin
+Priority: optional
+Build-Depends: debhelper (>= 8.0.0)
+
+Package: package_name
+Architecture: amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
+Conflicts: conserver-client
+Description: Cloud Foundry Cloud Controller
+ Cloud Foundry Cloud controller provides cloud_controller, console,
+ document_api, setup_yeti.
+

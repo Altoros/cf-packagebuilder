@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+
+base = 'http://blob.cfblob.com/'
+
+data = YAML.load(File.read(ARGV.shift))
+i = 0
+ARGV.each do |name|
+  print ';' if i > 0
+  i += 1
+  data.keys.each do |key|
+    if key.index(name) == 0
+      print "#{base}#{data[key]['object_id']}"
+      break
+    end
+  end
+end
+
+

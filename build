@@ -35,6 +35,9 @@ fi
 # CF UAA
 ./scripts/uaa
 
+# CF VCAP
+./scripts/registrar
+
 # CF login server
 ./scripts/login
 
