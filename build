@@ -59,6 +59,9 @@ fi
 # CF hm9000
 ./scripts/hm9000
 
+# Nginx
+./scripts/nginx
+
 rm -rf /$INSTALL_FOLDER
 cd $original_folder
 
