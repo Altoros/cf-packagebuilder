@@ -128,4 +128,7 @@ CF_JOBS=$CF_JOBS";login:cfloginjob:cflogin"
 CF_JOBS=$CF_JOBS";uaa:cfuaajob:cfuaa"
 export CF_JOBS
 
+# Nginx
+export CF_NGINX_PKG_NAME="nginx"
+export CF_NGINX_PKG_VERSION="2ppa"$BUILD
 

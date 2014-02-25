@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+use strict;
+my $control='';
+open(F,$ARGV[0]);
+my $concat_until_empty=1;
+my $check_package=0;
+
+while(<F>)
+{
+  if($check_package && $_ =~/^Package: $ARGV[1]/)
+  {
+    $concat_until_empty=1;
+    $control.=$_;
+    next;
+  }
+  if($concat_until_empty)
+  {
+    my $str=$_;
+    chomp($str);
+    if(length($str))
+    {
+      $control.=$_;
+      next;
+    }
+    else
+    {
+      $control.=$_;
+      $check_package=1;
+      $concat_until_empty=0;
+      next;
+    }
+  }
+}
+close(F);
+
+$control=~s/[\n\r]+$//;
+
+print $control;

@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# This script uses patch from https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=738543
+# This patch work with nginx 1.4.5
+# Newer Nginx may not be compatible with this patch. 
+# Newer Nginx package may contain upload module.
+# Please check.
+
+set -e
+echo "=== Installing Nginx ==="
+aptitude -y install gcc make autotools-dev libc6-dev build-essential libpcre3 libpcre3-dev zlib1g-dev zlib1g libssl-dev dh-systemd libexpat-dev libgd2-dev libgeoip-dev liblua5.1-dev libmhash-dev libpam0g-dev libperl-dev libxslt1-dev
+
+export PRJ=$CF_NGINX_PKG_NAME
+export UBUNTU_VERSION=$CF_NGINX_PKG_VERSION
+source $LIB_FOLDER/begin
+
+echo 'Patching nginx...'
+cd $TMP_FOLDER/$PRJ
+apt-get source nginx
+rm *debian.tar.gz
+rm *.dsc
+cd  nginx-1.4.5
+patch -p1 < $FILES_FOLDER/$PRJ/nginx-upload-module.patch
+sed -i "s|1ubuntu1|$UBUNTU_VERSION|" ./debian/changelog
+sed -i "s|Colin Watson <cjwatson@ubuntu.com>|$MAINTAINER_EMAIL|g" ./debian/changelog
+
+echo "Building packages..."
+dpkg-buildpackage $DASH_S -rfakeroot
+
+echo "Moving packages to $PKGS_FOLDER..."
+cd ..
+rm -rf $PKG
+mv ./* $PKGS_FOLDER/
+echo "Done"
+
+source $LIB_FOLDER/end
+
