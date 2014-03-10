@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script uses patch from https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=738543
-# This patch work with nginx 1.4.5
+# This patch work with nginx 1.4.6
 # Newer Nginx may not be compatible with this patch. 
 # Newer Nginx package may contain upload module.
 # Please check.
@@ -19,10 +19,18 @@ cd $TMP_FOLDER/$PRJ
 apt-get source nginx
 rm *debian.tar.gz
 rm *.dsc
-cd  nginx-1.4.5
+cd  nginx-1.4.6
 patch -p1 < $FILES_FOLDER/$PRJ/nginx-upload-module.patch
-sed -i "s|1ubuntu1|$UBUNTU_VERSION|" ./debian/changelog
-sed -i "s|Colin Watson <cjwatson@ubuntu.com>|$MAINTAINER_EMAIL|g" ./debian/changelog
+mv ./debian/changelog /tmp/changelog
+cat > ./debian/changelog <<EOL
+nginx (1.4.6-$UBUNTU_VERSION) trusty; urgency=medium
+
+  * Upload module support.
+
+ -- $MAINTAINER_EMAIL  $(date -R)
+
+EOL
+cat /tmp/changelog >> ./debian/changelog
 
 echo "Building packages..."
 dpkg-buildpackage $DASH_S -rfakeroot
