@@ -13,7 +13,7 @@ fi
 mkdir /$INSTALL_FOLDER
 
 # Build dependencies
-aptitude -y install git binutils lintian dh-make gnupg
+aptitude -y install git binutils lintian dh-make gnupg dput
 
 if [[ -d $FILES_FOLDER/keys/ ]]
 then
