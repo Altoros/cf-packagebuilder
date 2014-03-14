@@ -7,7 +7,6 @@ Build-Depends: debhelper (>= 8.0.0)
 Package: package_name
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
-Conflicts: conserver-client
 Description: Cloud Foundry NATS Server
  A lightweight publish-subscribe and distributed queueing messaging system.
 
