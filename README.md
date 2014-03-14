@@ -23,6 +23,12 @@ apt-add-repository ppa:cf-charm/ppa
 aptitude update
 aptitude install <package-name>
 ```
-
 If you want to install package from the local machine run `./build deb` and install resulting deb package.
+
+
+Package structure 
+---
+
+[cf-charm launcpad](https://launchpad.net/~cf-charm/+archive/ppa/+packages) repo has two kinds of packages. For instance for dea you will find `cfdea` and `cfdeajob` packages. `cfdea` will install `dea` within `/var/lib/cloudfoundry/cfdea/` folder and `cfdeajob` will add `/var/lib/cloudfoundry/cfdea/jobs` folder with all necessary binaries and configs. `cfdeajob` is created from cf-release with [job2package-tool](https://github.com/Altoros/cf-job2package-tool/blob/master/build.rb) script.
+
 
