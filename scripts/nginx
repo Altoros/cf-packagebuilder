@@ -32,6 +32,11 @@ nginx (1.4.6-$UBUNTU_VERSION) trusty; urgency=medium
 EOL
 cat /tmp/changelog >> ./debian/changelog
 
+echo "Allow unused-but-set-variable warning"
+sed -i 's|CFLAGS="$CFLAGS -Werror"|CFLAGS="$CFLAGS -Werror -Wno-error=unused-but-set-variable"|' ./auto/cc/gcc
+sed -i 's|CFLAGS="$CFLAGS -Werror"|CFLAGS="$CFLAGS -Werror -Wno-error=unused-but-set-variable"|' ./auto/cc/icc
+EDITOR=/bin/true dpkg-source -q --commit . allow_warning_unused_but_set_variable
+
 echo "Building packages..."
 dpkg-buildpackage $DASH_S -rfakeroot
 
