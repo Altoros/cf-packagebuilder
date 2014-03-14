@@ -127,11 +127,15 @@ CF_JOBS=$CF_JOBS";dea_next:cfdeajob:cfdea"
 CF_JOBS=$CF_JOBS";gorouter:cfgorouterjob:cfgorouter"
 CF_JOBS=$CF_JOBS";hm9000:cfhm9000job:cfhm9000"
 CF_JOBS=$CF_JOBS";login:cfloginjob:cflogin"
-#CF_JOBS=$CF_JOBS";nats::"
+CF_JOBS=$CF_JOBS";nats:cfnatsjobs:cfnats"
 CF_JOBS=$CF_JOBS";uaa:cfuaajob:cfuaa"
 export CF_JOBS
 
 # Nginx
 export CF_NGINX_PKG_NAME="nginx"
 export CF_NGINX_PKG_VERSION="3ppa"$BUILD
+
+# NAts
+export CF_NATS_PKG_NAME="cfnats"
+export CF_NATS_PKG_VERSION="1ppa"$BUILD
 
