@@ -133,5 +133,5 @@ export CF_JOBS
 
 # Nginx
 export CF_NGINX_PKG_NAME="nginx"
-export CF_NGINX_PKG_VERSION="2ppa"$BUILD
+export CF_NGINX_PKG_VERSION="3ppa"$BUILD
 
