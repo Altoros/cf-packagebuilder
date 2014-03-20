@@ -1,6 +1,11 @@
 #!/bin/bash
 
 set -e
+
+#update system
+apt-get update
+apt-get upgrade -y
+
 original_folder=`pwd`
 cd $(dirname $0)
 current_folder=`pwd`
