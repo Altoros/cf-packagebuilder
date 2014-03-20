@@ -9,6 +9,9 @@ Version: app_version-ubuntu_version
 Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}, DEPENDENCIES
 Description: Cloud Foundry Go Router
- The Router routes traffic coming into Cloud Foundry to the appropriate component – usually Cloud Controller or an application running on a DEA node.
- The router is implemented in Go. Routers listen for the messages that a DEA issues when an application comes online or goes offline, and maintain an in-memory routing table.
+ The Router routes traffic coming into Cloud Foundry to the appropriate
+ component – usually Cloud Controller or an application running on a DEA node.
+ The router is implemented in Go. Routers listen for the messages that a DEA
+ issues when an application comes online or goes offline, and maintain
+ an in-memory routing table.
  Incoming requests are load balanced across a pool of Routers.
