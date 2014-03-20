@@ -1,0 +1,8 @@
+.\" MAN PAGE
+.TH u_bin_name 1 "month day, year"
+.SH NAME
+bin_name \- A High Performance NATS Server written in Go.
+.SH DESCRIPTION
+.IP
+A lightweight publish-subscribe and distributed queueing messaging system.
+For more detales see https://github.com/apcera/gnatsd/blob/master/README.md

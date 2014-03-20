@@ -10,7 +10,7 @@ fi
 
 # Global vars
 
-export BUILD=3
+export BUILD=1
 
 export GBL_VER=153
 
@@ -76,7 +76,7 @@ export CF_REGISTAR_PKG_VERSION="1ppa"$BUILD
 export CF_LOGIN_REPO=https://github.com/cloudfoundry/login-server.git
 export CF_LOGIN_PKG_NAME="cflogin"
 export CF_LOGIN_PKG_VERSION="1ppa"$BUILD
-  
+
 # CF DEA
 export CF_DEA_REPO=https://github.com/cloudfoundry/dea_ng.git
 export CF_DEA_PKG_NAME="cfdea"
@@ -139,3 +139,7 @@ export CF_NGINX_PKG_VERSION="3ppa"$BUILD
 export CF_NATS_PKG_NAME="cfnats"
 export CF_NATS_PKG_VERSION="1ppa"$BUILD
 
+#GNATS
+export CF_GNATS_PKG_NAME="cfgnats"
+export CF_GNATS_PKG_VERSION="1ppa"$BUILD
+export CF_GNATS_REPO="github.com/apcera/gnatsd"

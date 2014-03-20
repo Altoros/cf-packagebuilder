@@ -2,14 +2,14 @@
 
 set -e
 
-#update system
-apt-get update
-apt-get upgrade -y
-
 original_folder=`pwd`
 cd $(dirname $0)
 current_folder=`pwd`
 source ./conf
+
+#update system
+aptitude update
+aptitude upgrade -y
 
 if [[ -d /$INSTALL_FOLDER ]]; then
   echo "Building process needs /$INSTALL_FOLDER. Please rename ( or move to bak folder ) your original /$INSTALL_FOLDER and run this script again."
@@ -69,6 +69,9 @@ fi
 
 # NATS
 ./scripts/nats
+
+# GNATS
+./scripts/gnats
 
 rm -rf /$INSTALL_FOLDER
 cd $original_folder
