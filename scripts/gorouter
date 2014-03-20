@@ -2,16 +2,21 @@
 
 set -e
 echo "=== Installing CF GOROUTER ==="
-aptitude -y install golang
+aptitude -y install golang bzr
 
 export PRJ=$CF_GOROUTER_PKG_NAME
 export UBUNTU_VERSION=$CF_GOROUTER_PKG_VERSION
 export SRC=$CF_GOROUTER_REPO
 source $LIB_FOLDER/begin
-git clone $SRC /$INSTALL_FOLDER/$PRJ
+mkdir -p /$INSTALL_FOLDER/$PRJ
 cd /$INSTALL_FOLDER/$PRJ
-git reset --hard $CF_GOROUTER_SHA
-git submodule update --init --recursive
+
+#do from a manual installation gorouter
+export GOPATH=/$INSTALL_FOLDER/$PRJ # or wherever
+export PATH=$GOPATH/bin:$PATH
+mkdir -p src/github.com/cloudfoundry
+git clone https://github.com/cloudfoundry/gorouter.git src/github.com/cloudfoundry/gorouter
+go get -v ./src/github.com/cloudfoundry/gorouter/...
 
 echo "Getting version..."
 VERSION=$GBL_VER
@@ -22,7 +27,7 @@ echo "Building package structure..."
 deb_dir_structure . $PKG $PRJ
 mkdir -p ./$PKG/$INSTALL_FOLDER/
 echo "Getting dependencies..."
-DEPENDS="golang"
+DEPENDS="golang, cfgnats"
 
 echo "Set file permissions..."
 deb_permissions ./$PKG/
@@ -30,6 +35,12 @@ deb_permissions /$INSTALL_FOLDER/$PRJ
 
 echo "Moving project into the package dir..."
 mv /$INSTALL_FOLDER/$PRJ ./$PKG/$INSTALL_FOLDER/
+
+#remove .git
+find ./$PKG/$INSTALL_FOLDER/ -name '.bzr*' | xargs rm -rf
+find ./$PKG/$INSTALL_FOLDER/ -name '.git*' | xargs rm -rf
+find ./$PKG/$INSTALL_FOLDER/ -name 'LICENSE' | xargs rm -rf
+find ./$PKG/$INSTALL_FOLDER/ -name 'LICENSE.libyaml' | xargs rm -rf
 
 echo "Creating man file for $PRJ..."
 cp $FILES_FOLDER/$PRJ/man ./$PKG/usr/share/man/man1/$PRJ.1
@@ -41,6 +52,30 @@ sed -i "s|bin_name|$PRJ|" ./$PKG/usr/share/man/man1/$PRJ.1
 sed -i "s|prj_name|$DEPENDS|" ./$PKG/usr/share/man/man1/$PRJ.1
 gzip -9 ./$PKG/usr/share/man/man1/$PRJ.1
 chmod 0644 ./$PKG/usr/share/man/man1/$PRJ.1.gz
+
+# Create binary for gorouter
+cat<<EOL > ./$PKG/usr/bin/gorouter
+#!/bin/sh
+
+export GOPATH=/$INSTALL_FOLDER/$PRJ # or wherever
+export PATH=\$GOPATH/bin:\$PATH
+
+gorouter
+
+EOL
+chmod 0755 ./$PKG/usr/bin/gorouter
+# mans
+echo "Creating man file for gorouter..."
+cp $FILES_FOLDER/$PRJ/man ./$PKG/usr/share/man/man1/gorouter.1
+sed -i "s|u_bin_name|GOROUTER|" ./$PKG/usr/share/man/man1/gorouter.1
+sed -i "s|day|$(date +%d)|" ./$PKG/usr/share/man/man1/gorouter.1
+sed -i "s|month|$(date +%B)|" ./$PKG/usr/share/man/man1/gorouter.1
+sed -i "s|year|$(date +%Y)|" ./$PKG/usr/share/man/man1/gorouter.1
+sed -i "s|bin_name|gorouter|" ./$PKG/usr/share/man/man1/gorouter.1
+sed -i "s|install_folder|$INSTALL_FOLDER|" ./$PKG/usr/share/man/man1/gorouter.1
+sed -i "s|prj_name|$PRJ|" ./$PKG/usr/share/man/man1/gorouter.1
+gzip -9 ./$PKG/usr/share/man/man1/gorouter.1
+chmod 0644 ./$PKG/usr/share/man/man1/gorouter.1.gz
 
 echo "Making source packages..."
 cd ./$PKG/
@@ -94,4 +129,3 @@ mv ./* $PKGS_FOLDER/
 echo "Done"
 
 source $LIB_FOLDER/end
-
