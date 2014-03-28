@@ -1,0 +1,13 @@
+
+
+Several of the go packages do not use pinned revisions.
+
+ - buildpack
+ - gnats 
+ - gorouter
+ - registrar / vcap-common
+
+
+some are just magical and dependent on undocumented manual steps
+
+ - rootfs

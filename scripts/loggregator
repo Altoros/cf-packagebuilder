@@ -1,49 +1,49 @@
 #!/bin/bash
 
-# TODO: create source package
-
 set -e
-echo "=== Installing CF CLI ==="
-aptitude -y install golang-go help2man
+echo "=== Installing CF Log Aggregator ==="
+aptitude -y install golang
 
-export PRJ=$CF_CLI_PKG_NAME
-export UBUNTU_VERSION=$CF_CLI_PKG_VERSION
-export SRC=$CF_CLI_REPO
-export WORKDIR="cli"
+export PRJ=$CF_LOGGREGATOR_PKG_NAME
+export UBUNTU_VERSION=$CF_LOGGREGATOR_PKG_VERSION
+export SRC=$CF_LOGGREGATOR_REPO
 source $LIB_FOLDER/begin
-
-git clone $SRC $WORKDIR
-VERSION=$GBL_VER
-PKG=$PRJ-$VERSION
-mv $WORKDIR $PKG
-
-echo "Building package structure..."
-deb_dir_structure . $PKG $PRJ
-
-cd $PKG
+git clone $SRC /$INSTALL_FOLDER/$PRJ
+cd /$INSTALL_FOLDER/$PRJ
+git reset --hard $CF_LOGGREGATOR_SHA
 git submodule update --init --recursive
 
-echo "Building..."
-./bin/build
-echo "Now you should see help output"
-./out/cf
+echo "Getting version..."
+VERSION=$GBL_VER
+PKG=$PRJ-$VERSION
 
-echo "Stripping binary file..."
-strip --strip-debug --strip-unneeded -o ./usr/bin/cf ./out/cf
-chmod 0755 ./usr/bin/cf
-
-echo "Creating man file..."
-cd ./usr/bin/
-help2man ./cf > ../share/man/man1/cf.1
 cd -
-sed -i "s/cf \\\- .*/cf \\\- A command line tool to interact with Cloud Foundry/" ./usr/share/man/man1/cf.1
-gzip -9 ./usr/share/man/man1/cf.1
-chmod 0644 ./usr/share/man/man1/cf.1.gz
-
+echo "Building package structure..."
+deb_dir_structure . $PKG $PRJ
+mkdir -p ./$PKG/$INSTALL_FOLDER/
 echo "Getting dependencies..."
-DEPENDS=`$LIB_FOLDER/dependencies ./usr/bin/cf`
+DEPENDS="golang"
+
+echo "Set file permissions..."
+deb_permissions ./$PKG/
+deb_permissions /$INSTALL_FOLDER/$PRJ
+
+echo "Moving project into the package dir..."
+mv /$INSTALL_FOLDER/$PRJ ./$PKG/$INSTALL_FOLDER/
+
+echo "Creating man file for $PRJ..."
+cp $FILES_FOLDER/$PRJ/man ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|u_bin_name|${PRJ^^}|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|day|$(date +%d)|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|month|$(date +%B)|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|year|$(date +%Y)|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|bin_name|$PRJ|" ./$PKG/usr/share/man/man1/$PRJ.1
+sed -i "s|prj_name|$DEPENDS|" ./$PKG/usr/share/man/man1/$PRJ.1
+gzip -9 ./$PKG/usr/share/man/man1/$PRJ.1
+chmod 0644 ./$PKG/usr/share/man/man1/$PRJ.1.gz
 
 echo "Making source packages..."
+cd ./$PKG/
 dh_make --createorig --packagename $PRJ"_"$VERSION --packageclass "s" --copyright "apache" --yes
 rm -rf debian
 mkdir debian
@@ -55,6 +55,7 @@ cp $FILES_FOLDER/$PRJ/rules ./debian/
 echo "Creating control file..."
 cp $FILES_FOLDER/$PRJ/control ./debian
 sed -i "s|package_name|$PRJ|g" ./debian/control
+sed -i "s|app_version-ubuntu_version|$VERSION-$UBUNTU_VERSION|g" ./debian/control
 sed -i "s|maintainer|$MAINTAINER_EMAIL|g" ./debian/control
 sed -i "s/DEPENDENCIES/$DEPENDS/g" ./debian/control
 chmod 0644 ./debian/control
@@ -71,9 +72,8 @@ chmod 0644 ./debian/changelog
 echo "Creating copyright file..."
 cp $FILES_FOLDER/$PRJ/copyright ./debian/
 sed -i "s|src|$SRC|g" ./debian/copyright
-sed -i "s/package_name/$PRJ/g" ./debian/copyright
-sed -i "s/year/$(date +%Y)/g" ./debian/copyright
-$LIB_FOLDER/cf_cli_copyright ./LICENSE ./debian/copyright
+sed -i "s|package_name|$PRJ|g" ./debian/copyright
+sed -i "s|year|$(date +%Y)|g" ./debian/copyright
 chmod 0644 ./debian/copyright
 
 echo "Create Install script..."
