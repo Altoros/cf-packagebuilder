@@ -8,8 +8,8 @@ current_folder=`pwd`
 source ./conf
 
 #update system
-aptitude update
-aptitude upgrade -y
+# aptitude update
+# aptitude upgrade -y
 
 if [[ -d /$INSTALL_FOLDER ]]; then
   echo "Building process needs /$INSTALL_FOLDER. Please rename ( or move to bak folder ) your original /$INSTALL_FOLDER and run this script again."

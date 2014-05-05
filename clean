@@ -11,3 +11,4 @@ rm -rf $PKGS_FOLDER/*
 
 cd $original_folder
 
+rm -rf /var/lib/cloudfoundry
